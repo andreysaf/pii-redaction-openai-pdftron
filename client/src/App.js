@@ -1,23 +1,32 @@
+import WebViewer from '@pdftron/webviewer';
+import { useRef, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const viewer = useRef(null);
+
+  useEffect(() => {
+    WebViewer(
+      {
+        path: '/lib',
+        fullAPI: true,
+        enableRedaction: true,
+        initialDoc: 'http://localhost:9000/files/legal-contract.pdf',
+      },
+      viewer.current
+    ).then((instance) => {
+      const { documentViewer, annotationManager } = instance.Core;
+
+      documentViewer.addEventListener('documentLoaded', async () => {
+        const res = await fetch('http://localhost:9000/getRedaction/legal-contract.pdf');
+        const data = await res.json();
+        const { xfdf } = data;
+        annotationManager.importAnnotations(xfdf);
+      });
+    });
+  }, []);
+
+  return <div className='App' ref={viewer}></div>;
 }
 
 export default App;
