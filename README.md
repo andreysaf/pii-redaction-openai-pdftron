@@ -14,6 +14,7 @@ PDFTRONKEY=
 OPENAI_API_KEY=
 ```
 
+After in the terminal run the following:
 ```
 cd client
 npm i
@@ -32,7 +33,7 @@ Node.js server will act as a file storage. [PDFTron Node.js SDK](https://www.pdf
 
 ### PII Identification
 
-`getNamesAndAddressesFromOpenAI` accepts text extracted from a document, and builds a `prompt` that accepts a natural language command to extract names and addresses. It can be modified to search for other information.
+`getNamesAndAddressesFromOpenAI` accepts text extracted from a document, and builds a `prompt` that accepts a natural language command to extract names and addresses. It can be modified to search for other information. For testing purposes the function is commented out. Please uncomment and build your `prompt` as needed.
 
 ```javascript
 const getNamesAndAddressesFromOpenAI = async (text) => {
@@ -49,7 +50,7 @@ const getNamesAndAddressesFromOpenAI = async (text) => {
 
 ### Summarization
 
-Summarization of the contract works in a similar way to PII search, where inside of the `prompt` `Tl;dr` is added to the end of the string that needs to be summarized.
+Summarization of the contract works in a similar way to PII search, where inside of the `prompt` `Tl;dr` is added to the end of the string that needs to be summarized. For testing purposes the function is commented out. Please uncomment and build your `prompt` as needed.
 
 ```javascript
 const summarizeTheContract = async (text) => {
