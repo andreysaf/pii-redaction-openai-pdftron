@@ -19,6 +19,9 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
+/**
+ * The endpoint to serve the PDF document from /files directory.
+ */
 app.get('/files/:filename', (req, res) => {
   const inputPath = path.resolve(__dirname, filesPath, req.params.filename);
   fs.readFile(inputPath, function (err, data) {
@@ -35,6 +38,9 @@ app.get('/files/:filename', (req, res) => {
   });
 });
 
+/**
+ * The endpoint to create markup redactions from a PDF document.
+ */
 app.get('/getRedaction/:filename', (req, res) => {
   createPIIMarkUpRedactions(req.params.filename)
     .then((data) => {
@@ -50,6 +56,11 @@ app.get('/getRedaction/:filename', (req, res) => {
     });
 });
 
+/**
+ * extractText extracts text from a PDF file using PDFTron SDK.
+ * @param {string} filename 
+ * @returns extracted text from a pdf file
+ */
 const extractText = async (filename) => {
   const inputPath = path.resolve(__dirname, filesPath, filename);
 
@@ -75,6 +86,11 @@ const extractText = async (filename) => {
   return await PDFNet.runWithCleanup(main, process.env.PDFTRONKEY);
 };
 
+/**
+ * searchForTextAndCreateMarkupRedactions searches for names, addresses in a text using OpenAI. You can modify the prompt to search for additional terms.
+ * @param {string} text 
+ * @returns returns an object containing the results.
+ */
 const getNamesAndAddressesFromOpenAI = async (text) => {
   return await openai.createCompletion('text-davinci-002', {
     prompt: `Extract names and address from this text: ${text}`,
@@ -86,6 +102,11 @@ const getNamesAndAddressesFromOpenAI = async (text) => {
   });
 };
 
+/**
+ * summarizeTheContract summarizes the text provided using OpenAI. 
+ * @param {string} text 
+ * @returns retutns an object containing the summary.
+ */
 const summarizeTheContract = async (text) => {
   return await openai.createCompletion('text-davinci-002', {
     prompt: `${text} \n\nTl;dr`,
@@ -97,6 +118,12 @@ const summarizeTheContract = async (text) => {
   });
 };
 
+/**
+ * searchForTextAndCreateMarkupRedactions searches for incidence of a the text provided and creates markup redaction using PDFTron SDK.
+ * @param {string} text - the text to search for
+ * @param {string} filename - the name of the file top search in
+ * @returns xfdfData - the xfdf data to be used to create redactions
+ */
 const searchForTextAndCreateMarkupRedactions = async (text, filename) => {
   const inputPath = path.resolve(__dirname, filesPath, filename);
 
@@ -167,6 +194,11 @@ const searchForTextAndCreateMarkupRedactions = async (text, filename) => {
   return await PDFNet.runWithCleanup(main, process.env.PDFTRONKEY);
 };
 
+/**
+ * createMarkupRedactions extracts text, analyzes it for PII and creates markup redactions using PDFTron SDK.
+ * @param {string} filename - the name of the file to extract text from, and search for names and addresses, summarize the text and create markup redactions.
+ * @returns 
+ */
 const createPIIMarkUpRedactions = async (filename) => {
   // extract text from a document
   const textToSearch = await extractText(filename);
